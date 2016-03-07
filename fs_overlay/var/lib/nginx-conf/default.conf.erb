@@ -2,9 +2,26 @@ server {
     listen       80;
     server_name  <%= domain.name %>;
 
-    location / {
-       return    301 https://$server_name$request_uri;
-    }
+    <% if domain.opt? :no_https_redirect %>
+      <% if domain.upstream %>
+          location / {
+          proxy_pass <%= domain.upstream %>;
+          proxy_set_header Host $host;
+          proxy_set_header X-Real-IP $remote_addr;
+          proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto $scheme;
+          }
+      <% else %>
+          location / {
+          root   <%= domain.www_root %>;
+          index  index.html;
+          }
+      <% end %>
+    <% else %>
+      location / {
+         return    301 https://$server_name$request_uri;
+      }
+    <% end %>
 
     <%= acme_challenge_location %>
 }

@@ -44,7 +44,28 @@ module NAConfig
   def self.parse(domain_desc)
     domain_desc.split(',').map(&:strip).delete_if{ |s| s == "" }.map do |domain|
       name, upstream = domain.split('->').map(&:strip)
-      Domain.new(name, upstream)
+
+      domain_name_env = domain_name_to_env name
+      if ENV[domain_name_env]
+        opts = parse_domain_opts ENV[domain_name_env]
+      else
+        opts = {}
+      end
+
+      Domain.new(name, upstream, opts)
     end
+  end
+
+  def self.parse_domain_opts(opt_string)
+    opts = {}
+    opt_string.split(',').map(&:strip).each do |opt|
+      key, value = opt.split('=', 2)
+      opts[key.to_sym] = value
+    end
+    opts
+  end
+
+  def self.domain_name_to_env(domain_name)
+    domain_name.gsub /[.-]/, '_'
   end
 end

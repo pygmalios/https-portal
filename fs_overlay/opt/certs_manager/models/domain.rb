@@ -4,9 +4,18 @@ class Domain
   attr_accessor :name
   attr_accessor :upstream
 
-  def initialize(name, upstream)
+  def initialize(name, upstream, opts = {})
     @name = name
     @upstream = upstream if upstream.to_s != ''
+    @opts = opts
+  end
+
+  def opt?(opt_key)
+    @opts.has_key? opt_key.to_sym
+  end
+
+  def opt(opt_key)
+    @opts[opt_key.to_sym]
   end
 
   def csr_path
