@@ -41,7 +41,8 @@ module Nginx
     binding_hash = {
       domain: domain,
       acme_challenge_location: acme_challenge_location_snippet,
-      dhparam_path: NAConfig.dhparam_path
+      dhparam_path: NAConfig.dhparam_path,
+      hsts_opts: hsts_opts(domain)
     }
 
     ERBBinding.new(template_path(domain, ssl), binding_hash).compile
@@ -67,5 +68,18 @@ module Nginx
           try_files $uri =404;
       }
     SNIPPET
+  end
+
+  def self.hsts_opts(domain)
+    if domain.opt? :hsts
+      hsts_max_age = domain.opt :hsts || 31536000
+      hsts_opts = ["max-age=#{hsts_max_age}"]
+      hsts_opts << 'includeSubDomains' if domain.opt? :hsts_subdomains
+      hsts_opts << 'preload' if domain.opt? :hsts_preload
+      hsts_opts_string = hsts_opts.join ';'
+      "add_header Strict-Transport-Security \"#{hsts_opts_string}\";"
+    else
+      ''
+    end
   end
 end

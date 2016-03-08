@@ -2,6 +2,8 @@ server {
     listen       80;
     server_name  <%= domain.name %>;
 
+    <%= hsts_opts %>
+
     <% if domain.opt? :no_https_redirect %>
       <% if domain.upstream %>
           location / {

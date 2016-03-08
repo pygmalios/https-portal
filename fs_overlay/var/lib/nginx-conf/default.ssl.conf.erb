@@ -20,6 +20,8 @@ server {
     ssl_stapling on;
     ssl_stapling_verify on;
 
+    <%= hsts_opts %>
+
     <% if domain.upstream %>
     location / {
         proxy_pass <%= domain.upstream %>;
