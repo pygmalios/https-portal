@@ -245,6 +245,13 @@ Now your certificates are available in `/data/ssl_certs` of your host.
 
 ## Advanced Usage
 
+### Configure virtual hosts through Environment variables
+
+You can configure HTTPS redirect and HSTS for every virtual host through environment variables.
+For example, for domain `hello-world.example.com` you create ENV variable with name `hello_world_example_com`
+(replace dashes and dots with underscores) and value `no_https_redirect,hsts=3600,hsts_subdomains,hsts_preload`.
+`hsts` options value means max-age in seconds and is optional (default is 1 year).
+
 ### Configure Nginx through Environment Variables
 
 There are several additional environment variables that you can use to config Nginx.
