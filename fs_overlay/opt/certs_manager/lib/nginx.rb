@@ -72,7 +72,7 @@ module Nginx
 
   def self.hsts_opts(domain)
     if domain.opt? :hsts
-      hsts_max_age = domain.opt :hsts || 31536000
+      hsts_max_age = domain.opt(:hsts) || 31536000
       hsts_opts = ["max-age=#{hsts_max_age}"]
       hsts_opts << 'includeSubDomains' if domain.opt? :hsts_subdomains
       hsts_opts << 'preload' if domain.opt? :hsts_preload
