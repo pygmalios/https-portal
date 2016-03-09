@@ -37,6 +37,14 @@ module OpenSSL
     end
   end
 
+  def self.ensure_catch_all_cert
+    unless File.exist? '/etc/ssl/catch_all_tls.key'
+      puts "Creating self signed catch all TLS certificate"
+      system 'mkdir -p /etc/ssl'
+      system 'openssl req -x509 -newkey rsa:2048 -keyout /etc/ssl/catch_all_tls.key -out /etc/ssl/catch_all_tls.pem -days 72000 -nodes -subj "/C=CC/ST=ST/L=L/O=O/OU=Org/CN=stranger"'
+    end
+  end
+
   private
 
   def self.expires_at(pem)
