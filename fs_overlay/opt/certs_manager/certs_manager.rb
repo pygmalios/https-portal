@@ -12,6 +12,7 @@ class CertsManager
 
     OpenSSL.ensure_dhparam
     OpenSSL.ensure_account_key
+    OpenSSL.ensure_catch_all_cert
     download_intermediate_cert
     Nginx.setup
     Nginx.start
