@@ -119,8 +119,10 @@ Note: `PRODUCTION` flag is `false` by default, which results in a test
 HTTPS-PORTAL is capable of discovering other Docker containers running on the
 same host, as long as Docker API socket is accessible within the container.
 
-In order to make it so, launch HTTPS-PORTAL using the following
-`docker-compose.yml`:
+In order to make it so, launch HTTPS-PORTAL using the following `docker-compose.yml`.
+
+**Notice**: Container discovery doesn't work with compose v2 syntax for now, because of an incompatibility between the
+new network interface and docker-gen.
 
 ```yaml
 https-portal:
@@ -262,7 +264,8 @@ The following are the config keys with default values:
 WORKER_PROCESSES=1
 WORKER_CONNECTIONS=1024
 KEEPALIVE_TIMEOUT=65
-GZIP=off
+GZIP=on
+SERVER_TOKENS=off
 SERVER_NAMES_HASH_MAX_SIZE=512
 SERVER_NAMES_HASH_BUCKET_SIZE=32        # defaults to 32 or 64 based on your CPU
 CLIENT_MAX_BODY_SIZE=1M                 # 0 disables checking request body size
@@ -286,8 +289,12 @@ https-portal:
     - /path/to/https_config:/var/lib/nginx-conf/my.example.com.ssl.conf.erb:ro
 ```
 
-An example can be found
-[here](/examples/custom_config).
+[This file](https://github.com/SteveLTN/https-portal/blob/master/fs_overlay/var/lib/nginx-conf/default.conf.erb) and [this file](https://github.com/SteveLTN/https-portal/blob/master/fs_overlay/var/lib/nginx-conf/default.ssl.conf.erb) are the default configuration files used by HTTPS-PORTAL.
+You can probably start by copying these files and make modifications on them.
+
+Another example can be found [here](/examples/custom_config).
+
+If you want to make an Nginx configuration that will be used by all sites, you can overwrite `/var/lib/nginx-conf/default.conf.erb` or `/var/lib/nginx-conf/default.ssl.conf.erb`. These two files will be propagated to each site if the site-specific configuration files are not provided.
 
 ## How It Works
 
