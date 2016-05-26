@@ -1,6 +1,6 @@
 FROM nginx
 
-MAINTAINER Weiyan Shao "lighteningman@gmail.com"
+MAINTAINER Ondrej Galbavy "o.galbavy@pygmalios.com"
 
 WORKDIR /root
 
