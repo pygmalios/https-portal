@@ -37,6 +37,23 @@ module OpenSSL
     end
   end
 
+  def self.self_sign(domain)
+    puts "Self-signing test certificate for #{domain.name}"
+
+    ensure_domain_key(domain)
+
+    command = <<-EOC
+    openssl x509 -req -days 90 \
+      -in #{domain.csr_path} \
+      -signkey #{domain.key_path} \
+      -out #{domain.signed_cert_path}
+    EOC
+
+    system command
+
+    system "cp #{domain.signed_cert_path} #{domain.chained_cert_path}"
+  end
+
   def self.ensure_catch_all_cert
     unless File.exist? '/etc/ssl/catch_all_tls.key'
       puts "Creating self signed catch all TLS certificate"
