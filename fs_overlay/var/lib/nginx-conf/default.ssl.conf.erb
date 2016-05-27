@@ -23,6 +23,14 @@ server {
     resolver 8.8.8.8 8.8.4.4 valid=300s;
     resolver_timeout 5s;
 
+    <% if domain.opt? :proxy_ssl_verify %>
+    proxy_ssl_verify <%= domain.opt :proxy_ssl_verify %>
+    <% end %>
+    <% if domain.opt? :proxy_ssl_verify_depth %>
+    proxy_ssl_verify_depth <%= domain.opt :proxy_ssl_verify_depth %>
+    <% end %>
+    <%= proxy_ssl_trusted_certificate_opts %>
+
     <%= hsts_opts %>
 
     <% if domain.upstream %>

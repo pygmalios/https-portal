@@ -1,3 +1,5 @@
+require 'base64'
+
 module Nginx
   def self.setup
     compiled_basic_config = ERBBinding.new('/var/lib/nginx-conf/nginx.conf.erb').compile
@@ -42,7 +44,8 @@ module Nginx
       domain: domain,
       acme_challenge_location: acme_challenge_location_snippet,
       dhparam_path: NAConfig.dhparam_path,
-      hsts_opts: hsts_opts(domain)
+      hsts_opts: hsts_opts(domain),
+      proxy_ssl_trusted_certificate_opts: proxy_ssl_trusted_certificate_opts(domain)
     }
 
     ERBBinding.new(template_path(domain, ssl), binding_hash).compile
@@ -78,6 +81,28 @@ module Nginx
       hsts_opts << 'preload' if domain.opt? :hsts_preload
       hsts_opts_string = hsts_opts.join ';'
       "add_header Strict-Transport-Security \"#{hsts_opts_string}\";"
+    else
+      ''
+    end
+  end
+
+  def self.proxy_ssl_trusted_certificate_opts(domain)
+    if domain.opt? :proxy_ssl_trusted_certificate
+      cert_tag = (domain.opt :proxy_ssl_trusted_certificate).upcase
+      cert_path = "/tmp/ssl_trusted_certificate_#{cert_tag}"
+
+      unless File.exist? cert_path
+        cert_content = Base64.decode64 ENV[cert_tag]
+        File.open cert_path, 'w' do |f|
+          f.write cert_content
+        end
+
+        unless ENV[cert_tag]
+          raise StandardError.new "Trusted certificate with tag #{cert_tag} is missing"
+        end
+      end
+
+      "proxy_ssl_trusted_certificate #{cert_path};"
     else
       ''
     end
