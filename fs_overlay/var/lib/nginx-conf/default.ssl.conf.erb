@@ -24,10 +24,10 @@ server {
     resolver_timeout 5s;
 
     <% if domain.opt? :proxy_ssl_verify %>
-    proxy_ssl_verify <%= domain.opt :proxy_ssl_verify %>
+    proxy_ssl_verify <%= domain.opt :proxy_ssl_verify %>;
     <% end %>
     <% if domain.opt? :proxy_ssl_verify_depth %>
-    proxy_ssl_verify_depth <%= domain.opt :proxy_ssl_verify_depth %>
+    proxy_ssl_verify_depth <%= domain.opt :proxy_ssl_verify_depth %>;
     <% end %>
     <%= proxy_ssl_trusted_certificate_opts %>
 
