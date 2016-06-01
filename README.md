@@ -19,6 +19,7 @@ Docker Hub page:
   - [See It Work](#see-it-work)
   - [Quick Start](#quick-start)
   - [Features](#features)
+    - [Test Locally](#test-locally)
     - [Automatic Container Discovery](#automatic-container-discovery)
     - [Hybrid Setup with Non-Dockerized Apps](#hybrid-setup-with-non-dockerized-apps)
     - [Multiple Domains](#multiple-domains)
@@ -64,7 +65,7 @@ https-portal:
     - '443:443'
   environment:
     DOMAINS: 'example.com'
-    # PRODUCTION: 'true'
+    # STAGE: 'production'
 ```
 
 Run `docker-compose up` command in the same directory. A moment later you'll
@@ -87,7 +88,7 @@ https-portal:
   restart: always
   environment:
     DOMAINS: 'wordpress.example.com -> http://wordpress'
-    # PRODUCTION: 'true'
+    # STAGE: 'production'
     # FORCE_RENEW: 'true'
 
 wordpress:
@@ -109,10 +110,38 @@ section are HTTPS-PORTAL specific configurations. This time we added an extra
 parameter `-d`, it will tell Docker Compose to run the apps defined in
 `docker-compose.yml` in background.
 
-Note: `PRODUCTION` flag is `false` by default, which results in a test
+Note: `STAGE` is `staging` by default, which results in a test
 (untrusted) certificate from Let's Encrypt.
 
 ## Features
+
+### Test Locally
+
+You can test HTTPS-PORTAL with your application stack locally.
+
+```yaml
+https-portal:
+  # ...
+  environment:
+    STAGE: local
+    DOMAINS: 'example.com'
+```
+
+When doing it, HTTPS-PORTAL will create a self-signed certificate.
+This certificated is not likely to be trusted by your browser, but you can
+use it to test your docker-compose file, make sure it works with your application
+stack.
+
+Note that HTTPS-PORTAL only listens to `example.com`, as you specified in the compose file.
+In order to make HTTPS-PORTAL respond to your connection, you need to either:
+
+* modify your `hosts` file to have `example.com` resolving to your docker host
+
+or
+
+* set up DNSMasq on your computer/router, this method provides more flexibility
+
+Once you are done testing, you can deploy your application stack to the server.
 
 ### Automatic Container Discovery
 
@@ -201,6 +230,12 @@ https-portal:
     -> http://gitlab'
 ```
 
+You can also specify the stage (`local`, `staging`, or `production`) for each individual site, note that stages of individual sites overrides the global stage:
+
+```yaml
+DOMAINS: 'wordpress.example.com -> http://wordpress #local, gitlab.example.com #production'
+```
+
 ### Serving Static Sites
 
 Instead of forwarding requests to web applications, HTTPS-PORTAL can also serve
@@ -218,7 +253,7 @@ https-portal:
 After HTTPS-PORTAL started, it will create corresponding sub-directories for
 each virtual host in `/data/https-portal/vhosts` directory on the host machine:
 
-```
+```yaml
 /data/https-portal/vhosts
 ├── hexo.example.com
 │  └── index.html
@@ -270,6 +305,14 @@ SERVER_NAMES_HASH_MAX_SIZE=512
 SERVER_NAMES_HASH_BUCKET_SIZE=32        # defaults to 32 or 64 based on your CPU
 CLIENT_MAX_BODY_SIZE=1M                 # 0 disables checking request body size
 ```
+
+You can also add
+
+```
+WEBSOCKET=true
+```
+
+to make HTTPS-PORTAL proxy WEBSOCKET connections.
 
 ### Override Nginx Configuration Files
 
@@ -325,10 +368,10 @@ HTTPS-PORTAL stores your certificates in a data volume and will not re-sign
 certificates until 30 days before expiration if a valid certificate is found
 (you can force renew certificates by using `FORCE_RENEW: 'true'` environment
 variable).  However if you play around with the image a lot, you can hit the
-limit. That's why `PRODUCTION` flag is off by default, and thus we use the
+limit. That's why `STAGE` is `staging` by default, and thus we use the
 Let's Encrypt staging server. When you made your experiments and feel
-everything is good, you can switch to production mode with `PRODUCTION:
-'true'`.
+everything is good, you can switch to production mode with `STAGE:
+'production'`.
 
 According to Let's Encrypt, the restrictions will be loosen as the beta goes.
 

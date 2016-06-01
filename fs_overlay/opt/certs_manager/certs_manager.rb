@@ -20,7 +20,7 @@ class CertsManager
     ensure_signed(NAConfig.domains)
 
     Nginx.stop
-    sleep 0.1
+    sleep 1 # Give Nginx some time to shutdown
   end
 
   def renew
