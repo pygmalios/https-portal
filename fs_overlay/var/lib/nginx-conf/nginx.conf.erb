@@ -47,6 +47,9 @@ http {
     <% if ENV['PROXY_BUFFER_SIZE'] %>
     proxy_buffer_size <%= ENV['PROXY_BUFFER_SIZE'] %>;
     <% end %>
+    <% if ENV['RESOLVER'] %>
+    resolver <%= ENV['RESOLVER'] %>;
+    <% end %>
 
     server {
         listen 80 default_server;
