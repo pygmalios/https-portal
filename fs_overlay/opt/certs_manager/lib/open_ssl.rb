@@ -22,7 +22,7 @@ module OpenSSL
 
     skip_conditions = File.exist?(domain.key_path) &&
                       File.exist?(domain.chained_cert_path) &&
-                      expires_in_days(domain.chained_cert_path) > 10
+                      expires_in_days(domain.chained_cert_path) > 30
 
     !skip_conditions
   end
